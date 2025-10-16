@@ -27,7 +27,7 @@ it('Modify API Response',()=>{
     cy.get('app-favorite-button').first().should('contain.text','9999999') //Validation of the favoriteCount value
 })
 
-it.only('waiting for api calls',()=>{
+it('waiting for api calls',()=>{
     cy.intercept('GET','**/api/articles*').as('articleApiCall')
     cy.loginToApplication()
     //cy.get('app-article-list').should('contain.text','Bondar Academy')    
@@ -41,3 +41,46 @@ it.only('waiting for api calls',()=>{
     })
 
 })
+
+it.only('delete article',()=>{
+    //1. Login
+    cy.request({
+        url:'https://conduit-api.bondaracademy.com/api/users/login',
+        method:'POST',
+        body:{
+            "user":
+            {
+                "email":"emna@gmail.com",
+                "password":"welcome"
+            }
+        }
+
+    }).then(response=>{
+        expect(response.status).to.equal(200)
+        const accessToken ='Token '+response.body.user.token
+    
+    //2.Create an Article:
+        cy.request({
+            url:'https://conduit-api.bondaracademy.com/api/articles/',
+            method:'POST',
+            body:
+            {"article":
+                {
+                "title":"test title cypress",
+                "description":"some description",
+                "body":"this is a body","tagList":[]
+                }
+            },
+            headers:{'Authorization':accessToken}
+        }).then(response=>{
+            expect(response.status).to.equal(201)
+            expect(response.body.article.title).to.equal('test title cypress')
+        })
+    })
+    //3. Delete the Article we created by on UI by clicking on delete button:
+    cy.loginToApplication()
+    cy.contains('test title cypress').click()
+    cy.contains('button','Delete Article').first().click()
+    cy.get('app-article-list').should('not.contain.text','test title cypress')
+})
+
