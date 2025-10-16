@@ -77,7 +77,7 @@ it.only('delete article',()=>{
             expect(response.body.article.title).to.equal('test title cypress')
         })
     })
-    //3. Delete the Article we created by on UI by clicking on delete button:
+    //3. Delete the Article we created  by clicking on delete button on UI:
     cy.loginToApplication()
     cy.contains('test title cypress').click()
     cy.contains('button','Delete Article').first().click()
