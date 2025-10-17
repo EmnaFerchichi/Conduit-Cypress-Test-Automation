@@ -52,7 +52,6 @@ The goal of this project is to:
     npm install
 
 ## Open Cypress (interactive mode)
-
    npx cypress open
    
 ##  Or run tests headlessly (terminal/CI)
