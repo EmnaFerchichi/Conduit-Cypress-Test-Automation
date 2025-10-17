@@ -43,7 +43,7 @@ it('waiting for api calls',()=>{
 
 })
 
-it('delete article',()=>{
+it('delete article',{retries:2},()=>{
     //1. Login
     cy.request({
         url:'https://conduit-api.bondaracademy.com/api/users/login',
@@ -51,8 +51,9 @@ it('delete article',()=>{
         body:{ // the same we created in Postman : the request is called "Sign_in" under Conduit Collection
             "user":
             {
-                "email":"emna@gmail.com",
-                "password":"welcome"
+            
+                "email":Cypress.env('username'),  
+                "password":Cypress.env('password') 
             }
         }
 
@@ -78,7 +79,7 @@ it('delete article',()=>{
             expect(response.body.article.title).to.equal('Test title Cypress API Testing') // in the response of the POST article creation response 
             // it should have "test title cypress" as titel => check Postman
         })
-        //Get All the Articles list 
+        //Get All the Articles list and verify if the title of the 1st article in the response of the request is equal to the one we created
         cy.request({
             url: 'https://conduit-api.bondaracademy.com/api/articles?limit=10&offset=0',
             method:'GET',
@@ -86,8 +87,8 @@ it('delete article',()=>{
         }).then(response=>{
             expect(response.status).to.equal(200)
             expect(response.body.articles[0].title).to.equal('Test title Cypress API Testing')
-            const slugID= response.body.articles[0].slug
-
+            const slugID= response.body.articles[0].slug //slug has 
+        //Delete the article we created
             cy.request({
                 url: `https://conduit-api.bondaracademy.com/api/articles/${slugID}`,
                 method:'DELETE',
@@ -96,6 +97,7 @@ it('delete article',()=>{
                 expect(response.status).to.equal(204)
             })
         })
+        //Verification that the Article is deleted:
         cy.request({
             url:'https://conduit-api.bondaracademy.com/api/articles?limit=10&offset=0',
             method:'GET',

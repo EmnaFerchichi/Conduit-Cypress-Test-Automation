@@ -8,5 +8,11 @@ module.exports = defineConfig({
     },
   },
   viewportWidth:1280,
-  viewportHeight:720
+  viewportHeight:720,
+  video:true,
+  env: {
+    username:'emna@gmail.com',
+    password:'welcome',
+  },
+ 
 });
