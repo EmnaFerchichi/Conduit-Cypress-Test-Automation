@@ -47,3 +47,19 @@ The goal of this project is to:
    ```bash
    git clone https://github.com/EmnaFerchichi/Conduit-Cypress-Test-Automation.git
    cd Conduit-Cypress-Test-Automation
+
+##  Install dependencies
+    npm install
+
+## Open Cypress (interactive mode)
+
+   npx cypress open
+   
+##  Or run tests headlessly (terminal/CI)
+   npx cypress run
+
+## Run a specific spec file
+   npx cypress run --spec "cypress/e2e/workingWithAPIs.cy.js"
+
+## Run tests interactively
+   npx cypress open
