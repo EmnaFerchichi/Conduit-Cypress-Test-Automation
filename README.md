@@ -46,7 +46,6 @@ The goal of this project is to:
 1. **Clone the repository**
    ```bash
    git clone https://github.com/EmnaFerchichi/Conduit-Cypress-Test-Automation.git
-   cd Conduit-Cypress-Test-Automation
 
 ##  Install dependencies
     npm install
