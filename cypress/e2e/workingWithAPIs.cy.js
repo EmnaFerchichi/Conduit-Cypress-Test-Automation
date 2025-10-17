@@ -36,18 +36,19 @@ it('waiting for api calls',()=>{
         console.log(apiArticleObject)
         expect(apiArticleObject.response.body.articles[0].title).to.contain('Bondar Academy')
     })
+    cy.wait(500)
     cy.get('app-article-list').invoke('text').then(allArticlesTexts=>{
         expect(allArticlesTexts).to.contain('Bondar Academy') //we look for the text "Bondar Academy"
     })
 
 })
 
-it.only('delete article',()=>{
+it('delete article',()=>{
     //1. Login
     cy.request({
         url:'https://conduit-api.bondaracademy.com/api/users/login',
         method:'POST',
-        body:{
+        body:{ // the same we created in Postman : the request is called "Sign_in" under Conduit Collection
             "user":
             {
                 "email":"emna@gmail.com",
@@ -56,8 +57,8 @@ it.only('delete article',()=>{
         }
 
     }).then(response=>{
-        expect(response.status).to.equal(200)
-        const accessToken ='Token '+response.body.user.token
+        expect(response.status).to.equal(200) // the response of the Post request must be 200 (check postman response)
+        const accessToken ='Token '+response.body.user.token // to retrive the token from the response of this Post request (check postman)
     
     //2.Create an Article:
         cy.request({
@@ -66,21 +67,48 @@ it.only('delete article',()=>{
             body:
             {"article":
                 {
-                "title":"test title cypress",
+                "title":"Test title Cypress API Testing",
                 "description":"some description",
                 "body":"this is a body","tagList":[]
                 }
             },
+            headers:{'Authorization':accessToken} //to put the token authorization in headers
+        }).then(response=>{
+            expect(response.status).to.equal(201) 
+            expect(response.body.article.title).to.equal('Test title Cypress API Testing') // in the response of the POST article creation response 
+            // it should have "test title cypress" as titel => check Postman
+        })
+        //Get All the Articles list 
+        cy.request({
+            url: 'https://conduit-api.bondaracademy.com/api/articles?limit=10&offset=0',
+            method:'GET',
             headers:{'Authorization':accessToken}
         }).then(response=>{
-            expect(response.status).to.equal(201)
-            expect(response.body.article.title).to.equal('test title cypress')
+            expect(response.status).to.equal(200)
+            expect(response.body.articles[0].title).to.equal('Test title Cypress API Testing')
+            const slugID= response.body.articles[0].slug
+
+            cy.request({
+                url: `https://conduit-api.bondaracademy.com/api/articles/${slugID}`,
+                method:'DELETE',
+                headers:{'Authorization':accessToken}
+            }).then(response=>{
+                expect(response.status).to.equal(204)
+            })
+        })
+        cy.request({
+            url:'https://conduit-api.bondaracademy.com/api/articles?limit=10&offset=0',
+            method:'GET',
+            headers:{'Authorization':accessToken}
+        }).then(response=>{
+            expect(response.status).to.equal(200)
+            expect(response.body.articles[0].title).to.not.equal('Test title Cypress API Testing')
         })
     })
     //3. Delete the Article we created  by clicking on delete button on UI:
-    cy.loginToApplication()
-    cy.contains('test title cypress').click()
-    cy.contains('button','Delete Article').first().click()
-    cy.get('app-article-list').should('not.contain.text','test title cypress')
+    //cy.loginToApplication()
+    //cy.contains('test title cypress').click()
+    //cy.contains('button','Delete Article').first().click()
+    //cy.get('app-article-list').should('not.contain.text','test title cypress')
 })
 
